@@ -1,2 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_juego_juego,juego.juego,model_juego_juego,base.group_user,1,1,1,1
+access_juego_jugador,juego.jugador,model_juego_jugador,base.group_user,1,1,1,1
+access_juego_planeta,juego.planeta,model_juego_planeta,base.group_user,1,1,1,1
+access_juego_edificio_tipo,juego.edificio_tipo,model_juego_edificio_tipo,base.group_user,1,1,1,1
+
