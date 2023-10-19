@@ -22,12 +22,13 @@ class jugador(models.Model):
             if n.nombre == "":
                 raise ValidationError("El nombre no puede estar vacio")
 
+
 class planeta(models.Model):
     _name = 'juego.planeta'
     _description = 'Uno de los planetas'
 
     nombre = fields.Char()
-    jugador = fields.Many2one('juego.jugador', ondelete="cascade")
+    jugador = fields.Many2one('juego.jugador')
     edificios = fields.One2many('juego.edificio', 'planeta')
 
 
@@ -36,39 +37,37 @@ class edificio(models.Model):
     _description = 'Edificio'
 
     nombre = fields.Char(related='tipo.nombre')
-    tipo = fields.Many2one('juego.edificio_tipo', ondelete='restrict')
+    planeta = fields.Many2one('juego.planeta', ondelete='cascade')
+    #   Pensar nombres que ponerles
+    tipo = fields.Selection([('1', 'sad'), ('2', 'patata'), ('3', 'sdioa'), ('4', 'ewqe')])
     nivel = fields.Float(default=1)
     vida = fields.Integer()
-    planeta = fields.One2many('juego.planeta', ondelete='cascade')
     max_vida = fields.Integer()
     atq = fields.Integer()
     produccion_oro = fields.Integer()
 
 
-def _calcular_estadisticas(self):
+@api_depends('tipo', 'nivel')
+def _tipos(self):
     for e in self:
-        e.max_vida = e.tipo.max_vida * (e.nivel / 3)
-        e.vida = e.tipo.max_vida
-        e.atq = e.tipo.atq * (e.nivel / 5)
-        e.produccion_oro = e.tipo.produccion_oro * ()
-
-@api.depends('tipo', 'nivel')
-def _aumentar_estadisticas(self):
-    for e in self:
-
-
-
-
-
-class edificio_tipo(models.Model):
-    _name = 'juego.edificio_tipo'
-    _description = 'Tipo edificio'
-
-    nombre = fields.Char()
-    planeta = fields.Many2one('juego.planeta', ondelete="cascade")
-    atq = fields.Integer()
-    produccion_oro = fields.Float()
-    max_vida = fields.Float()
-
-
-#    produccion_(otro recurso pa dar a las tropas) = fields.Float()
+#       Poner estadisticas distintas dependiendo del tipo
+        if e.tipo == '1':
+            e.max_vida = e.max_vida * (e.nivel / 3)
+            e.vida = e.max_vida
+            e.atq = e.atq * (e.nivel / 5)
+            e.produccion_oro = e.produccion_oro * ()
+        elif e.tipo == '2':
+            e.max_vida = e.max_vida * (e.nivel / 3)
+            e.vida = e.max_vida
+            e.atq = e.atq * (e.nivel / 5)
+            e.produccion_oro = e.produccion_oro * ()
+        elif e.tipo == '3':
+            e.max_vida = e.max_vida * (e.nivel / 3)
+            e.vida = e.max_vida
+            e.atq = e.atq * (e.nivel / 5)
+            e.produccion_oro = e.produccion_oro * ()
+        elif e.tipo == '4':
+            e.max_vida = e.max_vida * (e.nivel / 3)
+            e.vida = e.max_vida
+            e.atq = e.atq * (e.nivel / 5)
+            e.produccion_oro = e.produccion_oro * ()
