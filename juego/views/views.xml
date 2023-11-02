@@ -7,9 +7,9 @@
       <field name="view_mode">tree,form</field>
     </record>
 
-    <record model="ir.actions.act_window" id="juego.action_planeta">
-      <field name="name">planeta window</field>
-      <field name="res_model">juego.planeta</field>
+    <record model="ir.actions.act_window" id="juego.action_planetas">
+      <field name="name">planetas window</field>
+      <field name="res_model">juego.planetas</field>
       <field name="view_mode">tree,form</field>
     </record>
 
@@ -19,10 +19,27 @@
       <field name="view_mode">tree,form</field>
     </record>
 
-    <record model="ir.actions.act_window" id="juego.action_edificio_tipo">
-      <field name="name">edificio_tipo window</field>
-      <field name="res_model">juego.edificio_tipo</field>
+    <record model="ir.actions.act_window" id="juego.action_batalla">
+      <field name="name">batalla window</field>
+      <field name="res_model">juego.batalla</field>
       <field name="view_mode">tree,form</field>
+    </record>
+
+    <record model="ir.ui.view" id="juego.batalla_calendar_view">
+      <field name="name">Batalla Calendar</field>
+      <field name="model">juego.batalla</field>
+      <field name="arch" type="xml">
+        <calendar string="Batalla Calendar" date_start="fecha_inicio" date_stop="fecha_final">
+          <field name="nombre"/>
+        </calendar>
+      </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="juego.action_batalla_calendario">
+      <field name="name">batalla window</field>
+      <field name="res_model">juego.batalla</field>
+      <field name="view_mode">calendar</field>
+      <field name="view_id" ref="juego.batalla_calendar_view"/>
     </record>
 
 
@@ -33,14 +50,19 @@
     <menuitem name="Jugador" id="juego.menu_1_jugador" parent="juego.menu_management"
               action="juego.action_jugador"/>
 
-    <menuitem name="Planeta" id="juego.menu_1_planeta" parent="juego.menu_management"
-              action="juego.action_planeta"/>
+    <menuitem name="Planetas" id="juego.menu_1_planetas" parent="juego.menu_management"
+              action="juego.action_planetas"/>
 
     <menuitem name="Edificio" id="juego.menu_1_edificio" parent="juego.menu_management"
               action="juego.action_edificio"/>
 
-    <menuitem name="Tipo Edificio" id="juego.menu_1_edificio_tipo" parent="juego.menu_management"
-              action="juego.action_edificio_tipo"/>
+    <menuitem name="Batalla" id="juego.menu_1_batalla" parent="juego.menu_management"
+              action="juego.action_batalla"/>
+
+    <menuitem name="Batallas" id="juego.menu_1_batallas" parent="juego.menu_management"
+          action="juego.action_batalla_calendario"/>
+
+
 
   </data>
 </odoo>

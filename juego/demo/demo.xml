@@ -1,10 +1,5 @@
 <odoo>
     <data>
-        <!--Preguntar a ChatGPT pa que haga un demo cuando este to terminado
-        <record id="juego.jugador.demo" model="juego.jugador">
-            <field name=""></field>
-        </record>
-        -->
 <!--
           <record id="object0" model="juego.juego">
             <field name="name">Object 0</field>
