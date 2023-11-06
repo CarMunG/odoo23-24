@@ -6,9 +6,12 @@
 # poner cosas de Demo en demo.xml
 # Crear botones y cosas en views.xml
 # Si algo da error y no sabes que es, entra sin update y desinstala->instala el modulo
+# Hacer un Crono Job pa que se actualicen las weas cada minuto
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 
 class jugador(models.Model):
@@ -50,20 +53,12 @@ class edificio(models.Model):
                              ('4', 'amongus'), ('5', 'mina de oro'), ('6', 'torre de comando'), ('7', 'alfredo'),
                              ('8', 'destructor 3000')])
     nivel = fields.Float(default=1)
-    vida = fields.Integer(compute='_tipos', store=True)
-    max_vida = fields.Integer(compute='_tipos', store=True)
-    atq = fields.Integer(compute='_tipos', store=True)
-    produccion_oro = fields.Integer(compute='_tipos', store=True)
+    vida = fields.Integer(compute='_tipos')
+    max_vida = fields.Integer(compute='_tipos')
+    atq = fields.Integer(compute='_tipos')
+    produccion_oro = fields.Integer(compute='_tipos')
 
-# La funcion deberia cambiar dinamicamente los objetos esos, pero no lo hace
-
-    @api.model
-    def create(self, values):
-        record = super(edificio, self).create(values)
-        record._tipos()
-        return record
-
-    @api.onchange('tipo', 'nivel')
+    @api.depends('tipo', 'nivel')
     def _tipos(self):
         for e in self:
             if e.tipo and e.nivel:
@@ -119,5 +114,18 @@ class batalla(models.Model):
     _description = 'Batalla'
 
     nombre = fields.Char()
-    fecha_inicio = fields.Datetime()
-    fecha_final = fields.Datetime()
+    fecha_inicio = fields.Datetime(default=lambda self: fields.Datetime.now())
+    fecha_final = fields.Datetime(compute='_get_fecha_final')
+    fecha_restante = fields.Char(compute='_get_fecha_final')
+    fecha_progreso = fields.Float(compute='_get_fecha_final')
+
+    @api.depends('fecha_inicio')
+    def _get_fecha_final(self):
+        for b in self:
+            inicio = fields.Datetime.from_string(b.fecha_inicio)
+            final = inicio + timedelta(hours=2)
+            restante = relativedelta(final, datetime.now()).total_seconds() / 60
+            tiempo_pasado = (datetime.now()-inicio).total_seconds()
+            b.fecha_final = fields.Datetime.to_string(final)
+            b.fecha_restante = str(restante.hours) + ":" + str(restante.minutes) + ":" + str(restante.seconds)
+            b.fecha_progreso = (tiempo_pasado*100)/(b.fecha_final*60)
