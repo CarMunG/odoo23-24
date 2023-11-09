@@ -1,0 +1,44 @@
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="juego.formulario_edificio">
+            <field name="name">edificio.fomulario</field>
+            <field name="model">juego.edificio</field>
+            <field name="arch" type="xml">
+                <form string="Edificio">
+                    <sheet>
+                        <group>
+                            <field name="nombre"/>
+                            <field name="planeta"/>
+                            <field name="tipo"/>
+                            <field name="nivel"/>
+                            <field name="porcentaje_nivel" widget="progressbar"/>
+                            <field name="vida"/>
+                            <field name="max_vida"/>
+                            <field name="atq"/>
+                            <field name="produccion_oro"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="juego.view_lista_edificios">
+            <field name="name">edificio tree</field>
+            <field name="model">juego.edificio</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="nombre"/>
+                    <field name="planeta"/>
+                    <field name="tipo"/>
+                    <field name="nivel"/>
+                    <field name="porcentaje_nivel" widget="progressbar"/>
+                    <field name="vida"/>
+                    <field name="max_vida"/>
+                    <field name="atq"/>
+                    <field name="produccion_oro"/>
+                </tree>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -59,7 +59,7 @@
     <menuitem name="Batalla" id="juego.menu_1_batalla" parent="juego.menu_management"
               action="juego.action_batalla"/>
 
-    <menuitem name="Batallas" id="juego.menu_1_batallas" parent="juego.menu_management"
+    <menuitem name="Calendario Batallas" id="juego.menu_1_batallas" parent="juego.menu_management"
           action="juego.action_batalla_calendario"/>
 
 

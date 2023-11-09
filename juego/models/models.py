@@ -18,7 +18,7 @@ class jugador(models.Model):
     _name = 'juego.jugador'
     _description = 'El jugador'
 
-    nombre = fields.Char(required=True)
+    nombre = fields.Char(compute='_nombre_vacio')
     planetas = fields.One2many('juego.planetas', 'jugador')
 
     @api.constrains('nombre')
@@ -40,7 +40,10 @@ class planetas(models.Model):
     @api.depends('edificios')
     def _get_cant_edif(self):
         for e in self:
-            e.num_edificios = len(e.edificios)
+            if e.edificios:
+                e.num_edificios = len(e.edificios)
+            else:
+                e.num_edificios = 0
 
 
 class edificio(models.Model):
@@ -52,56 +55,64 @@ class edificio(models.Model):
     tipo = fields.Selection([('1', 'soldado generico'), ('2', 'torre laser'), ('3', 'soplador de aire'),
                              ('4', 'amongus'), ('5', 'mina de oro'), ('6', 'torre de comando'), ('7', 'alfredo'),
                              ('8', 'destructor 3000')])
-    nivel = fields.Float(default=1)
-    vida = fields.Integer(compute='_tipos')
-    max_vida = fields.Integer(compute='_tipos')
-    atq = fields.Integer(compute='_tipos')
-    produccion_oro = fields.Integer(compute='_tipos')
+    nivel = fields.Integer(default=1)
+    vida = fields.Float(compute='_tipos')
+    max_vida = fields.Float(compute='_tipos')
+    atq = fields.Float(compute='_tipos')
+    produccion_oro = fields.Float(compute='_tipos')
+    porcentaje_nivel = fields.Float(default=0)
+
+    def subir_nivel(self):
+        for e in self.search([('porcentaje_nivel', '<', 100)]):
+            e.porcentaje_nivel += 1 / (e.nivel + 1)
+            if e.porcentaje_nivel >= 100:
+                e.porcentaje_nivel = 0
+                e.nivel += 1
 
     @api.depends('tipo', 'nivel')
     def _tipos(self):
         for e in self:
             if e.tipo and e.nivel:
                 if e.tipo == '1':
-                    e.max_vida = e.max_vida * (e.nivel / 3)
+                    e.max_vida = e.nivel * 100
                     e.vida = e.max_vida
-                    e.atq = e.atq * (e.nivel / 5)
-                    e.produccion_oro = e.produccion_oro * 0
+                    e.atq = e.nivel * 10
+                    e.produccion_oro = 0
                 elif e.tipo == '2':
-                    e.max_vida = e.max_vida * (e.nivel / 4)
+                    e.max_vida = e.nivel * 150
                     e.vida = e.max_vida
-                    e.atq = e.atq * (e.nivel / 2)
-                    e.produccion_oro = e.produccion_oro * 1
+                    e.atq = e.nivel * 15
+                    e.produccion_oro = e.nivel * 10
                 elif e.tipo == '3':
-                    e.max_vida = e.max_vida * (e.nivel / 2)
+                    e.max_vida = e.nivel * 120
                     e.vida = e.max_vida
-                    e.atq = e.atq * (e.nivel / 6)
-                    e.produccion_oro = e.produccion_oro * 0
+                    e.atq = e.nivel * 30
+                    e.produccion_oro = 0
                 elif e.tipo == '4':
-                    e.max_vida = e.max_vida * (e.nivel / 4)
+                    e.max_vida = e.nivel * 80
                     e.vida = e.max_vida
-                    e.atq = e.atq * (e.nivel / 4)
-                    e.produccion_oro = e.produccion_oro * 0
+                    e.atq = e.nivel * 20
+                    e.produccion_oro = 0
                 elif e.tipo == '5':
-                    e.max_vida = e.max_vida * (e.nivel / 3)
+                    e.max_vida = e.nivel * 120
                     e.vida = e.max_vida
-                    e.atq = e.atq * 0
-                    e.produccion_oro = e.produccion_oro * e.nivel
+                    e.atq = 0
+                    e.produccion_oro = e.nivel * 20
                 elif e.tipo == '6':
-                    e.max_vida = e.max_vida * (e.nivel / 2)
+                    e.max_vida = e.nivel * 80
                     e.vida = e.max_vida
-                    e.atq = e.atq * 0
-                    e.produccion_oro = e.produccion_oro * 0.5
+                    e.atq = e.nivel * 5
+                    e.produccion_oro = e.nivel * 0.5
                 elif e.tipo == '7':
-                    e.max_vida = e.max_vida * (e.nivel / 2)
+                    e.max_vida = e.nivel * 90
                     e.vida = e.max_vida
-                    e.atq = e.atq * (e.nivel / 3)
-                    e.produccion_oro = e.produccion_oro * 0.25
+                    e.atq = e.nivel * 30
+                    e.produccion_oro = e.nivel * 0.25
                 elif e.tipo == '8':
-                    e.max_vida = e.max_vida * (e.nivel * 4)
+                    e.max_vida = e.nivel * 400
                     e.vida = e.max_vida
-                    e.atq = e.atq * (e.nivel * 4)
-                    e.produccion_oro = e.produccion_oro * 0
+                    e.atq = e.nivel * 40
+                    e.produccion_oro = 0
             else:
                 e.max_vida = None
                 e.vida = None
@@ -111,7 +122,7 @@ class edificio(models.Model):
 
 class batalla(models.Model):
     _name = 'juego.batalla'
-    _description = 'Batalla'
+    _description = 'Una batalla'
 
     nombre = fields.Char()
     fecha_inicio = fields.Datetime(default=lambda self: fields.Datetime.now())
@@ -124,8 +135,9 @@ class batalla(models.Model):
         for b in self:
             inicio = fields.Datetime.from_string(b.fecha_inicio)
             final = inicio + timedelta(hours=2)
-            restante = relativedelta(final, datetime.now()).total_seconds() / 60
-            tiempo_pasado = (datetime.now()-inicio).total_seconds()
+            restante = final - datetime.now()
+            tiempo_pasado = (datetime.now() - inicio).total_seconds() / 60
             b.fecha_final = fields.Datetime.to_string(final)
-            b.fecha_restante = str(restante.hours) + ":" + str(restante.minutes) + ":" + str(restante.seconds)
-            b.fecha_progreso = (tiempo_pasado*100)/(b.fecha_final*60)
+            b.fecha_restante = "{:02}:{:02}:{:02}".format(restante.seconds // 3600, (restante.seconds // 60) % 60,
+                                                          restante.seconds % 60)
+            b.fecha_progreso = (tiempo_pasado * 100) / (2 * 60)

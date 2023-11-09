@@ -1,0 +1,15 @@
+<odoo>
+    <data>
+        <record model="ir.cron" id="juego.cron_actualizar_niveles">
+            <field name="name">Juego: Cron Actualizar Niveles</field>
+            <field name="model_id" ref="model_juego_edificio"/>
+            <field name="state">code</field>
+            <field name="code">model.subir_nivel</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+        </record>
+    </data>
+</odoo>
