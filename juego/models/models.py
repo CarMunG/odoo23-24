@@ -52,8 +52,8 @@ class edificio(models.Model):
 
     nombre = fields.Char()
     planeta = fields.Many2one('juego.planetas')
-    tipo = fields.Selection([('1', 'soldado generico'), ('2', 'torre laser'), ('3', 'soplador de aire'),
-                             ('4', 'amongus'), ('5', 'mina de oro'), ('6', 'torre de comando'), ('7', 'alfredo'),
+    tipo = fields.Selection([('1', 'soldado generico'), ('2', 'mina de oro'), ('3', 'soplador de aire'),
+                             ('4', 'amongus'), ('5', 'torre laser'), ('6', 'torre de comando'), ('7', 'alfredo'),
                              ('8', 'destructor 3000')])
     nivel = fields.Integer(default=1)
     vida = fields.Float(compute='_tipos')
@@ -62,12 +62,21 @@ class edificio(models.Model):
     produccion_oro = fields.Float(compute='_tipos')
     porcentaje_nivel = fields.Float(default=0)
 
+    @api.constrains('nivel')
+    def _check_nivel_limit(self):  # Nivel 99 es el maximo
+        for e in self:
+            if e.nivel > 99:
+                raise ValidationError('El nivel del edificio no puede superar 99')
+
+    @api.model
     def subir_nivel(self):
         for e in self.search([('porcentaje_nivel', '<', 100)]):
             e.porcentaje_nivel += 1 / (e.nivel + 1)
-            if e.porcentaje_nivel >= 100:
+            if e.porcentaje_nivel >= 100 & e.nivel < 99:
                 e.porcentaje_nivel = 0
                 e.nivel += 1
+            elif e.porcentaje_nivel >= 100 & e.nivel == 99:
+                e.porcentaje_nivel = 100  # se queda en 100% para dar a entender que es el nivel maximo
 
     @api.depends('tipo', 'nivel')
     def _tipos(self):
@@ -79,10 +88,10 @@ class edificio(models.Model):
                     e.atq = e.nivel * 10
                     e.produccion_oro = 0
                 elif e.tipo == '2':
-                    e.max_vida = e.nivel * 150
+                    e.max_vida = e.nivel * 120
                     e.vida = e.max_vida
-                    e.atq = e.nivel * 15
-                    e.produccion_oro = e.nivel * 10
+                    e.atq = 0
+                    e.produccion_oro = e.nivel * 20
                 elif e.tipo == '3':
                     e.max_vida = e.nivel * 120
                     e.vida = e.max_vida
@@ -94,10 +103,10 @@ class edificio(models.Model):
                     e.atq = e.nivel * 20
                     e.produccion_oro = 0
                 elif e.tipo == '5':
-                    e.max_vida = e.nivel * 120
+                    e.max_vida = e.nivel * 150
                     e.vida = e.max_vida
-                    e.atq = 0
-                    e.produccion_oro = e.nivel * 20
+                    e.atq = e.nivel * 15
+                    e.produccion_oro = e.nivel
                 elif e.tipo == '6':
                     e.max_vida = e.nivel * 80
                     e.vida = e.max_vida

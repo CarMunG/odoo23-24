@@ -1,30 +1,38 @@
 <odoo>
     <data>
-<!--
-          <record id="object0" model="juego.juego">
-            <field name="name">Object 0</field>
-            <field name="value">0</field>
-          </record>
+        <!-- Datos demo -->
+        <!-- Jugador -->
+        <record id="demo_jugador" model="juego.jugador">
+            <field name="nombre">Perico</field>
+            <field name="planetas" widget="many2many_tags">
+                [(4, ref('demo_planeta'))]
+            </field>
+        </record>
 
-          <record id="object1" model="juego.juego">
-            <field name="name">Object 1</field>
-            <field name="value">10</field>
-          </record>
+        <!-- Planeta -->
+        <record id="demo_planeta" model="juego.planetas">
+            <field name="nombre">Planeta Tierra</field>
+            <field name="jugador" ref="demo_jugador"/>
+            <field name="edificios" widget="many2many_tags">
+                [(4, ref('demo_edificio1')), (4, ref('demo_edificio2'))]
+            </field>
+        </record>
 
-          <record id="object2" model="juego.juego">
-            <field name="name">Object 2</field>
-            <field name="value">20</field>
-          </record>
+        <!-- Edificios -->
+        <record id="demo_edificio1" model="juego.edificio">
+            <field name="nombre">Edificio 1</field>
+            <field name="planeta" ref="demo_planeta"/>
+            <field name="tipo">1</field>
+            <field name="nivel">3</field>
+            <field name="porcentaje_nivel">0.0</field>
+        </record>
 
-          <record id="object3" model="juego.juego">
-            <field name="name">Object 3</field>
-            <field name="value">30</field>
-          </record>
-
-          <record id="object4" model="juego.juego">
-            <field name="name">Object 4</field>
-            <field name="value">40</field>
-          </record>
--->
+        <record id="demo_edificio2" model="juego.edificio">
+            <field name="nombre">Edificio 2</field>
+            <field name="planeta" ref="demo_planeta"/>
+            <field name="tipo">5</field>
+            <field name="nivel">1</field>
+            <field name="porcentaje_nivel">90.0</field>
+        </record>
     </data>
 </odoo>
