@@ -45,7 +45,7 @@
 
     <menuitem name="Juego" id="juego.menu_root"/>
 
-    <menuitem name="Menu 1" id="juego.menu_management" parent="juego.menu_root"/>
+    <menuitem name="Menu" id="juego.menu_management" parent="juego.menu_root"/>
 
     <menuitem name="Jugador" id="juego.menu_1_jugador" parent="juego.menu_management"
               action="juego.action_jugador"/>

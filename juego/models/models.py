@@ -2,11 +2,13 @@
 
 # Cada vez que se crea una clase añadirlo con permisos a security
 # si creo un nuevo archivo ponerlo en el init
-# todas las clases ponerlas en el views.xml
-# poner cosas de Demo en demo.xml
-# Crear botones y cosas en views.xml
+# todas las clases ponerlas en el views.xml y crear modelos para vistas.xml
+# ya cosas de Demo en demo.xml (1 Jugador, 1 planeta, 2 edificios)
+# Crear botones y cosas en vistas.xml
+# Poner mas constrains
+# Calcular las batallas
+# Crono Jobs: 1- sube de nivel los edificios cada min
 # Si algo da error y no sabes que es, entra sin update y desinstala->instala el modulo
-# Hacer un Crono Job pa que se actualicen las weas cada minuto
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
@@ -18,13 +20,14 @@ class jugador(models.Model):
     _name = 'juego.jugador'
     _description = 'El jugador'
 
-    nombre = fields.Char(compute='_nombre_vacio')
+    nombre = fields.Char()
     planetas = fields.One2many('juego.planetas', 'jugador')
+    oro = fields.Integer(default=50)
 
     @api.constrains('nombre')
     def _nombre_vacio(self):
         for n in self:
-            if n.nombre == "":
+            if not n.nombre:
                 raise ValidationError("El nombre no puede estar vacio")
 
 
@@ -46,11 +49,10 @@ class planetas(models.Model):
                 e.num_edificios = 0
 
 
-class edificio(models.Model):
+class edificio (models.Model):
     _name = 'juego.edificio'
     _description = 'Edificio'
 
-    nombre = fields.Char()
     planeta = fields.Many2one('juego.planetas')
     tipo = fields.Selection([('1', 'soldado generico'), ('2', 'mina de oro'), ('3', 'soplador de aire'),
                              ('4', 'amongus'), ('5', 'torre laser'), ('6', 'torre de comando'), ('7', 'alfredo'),
@@ -61,6 +63,15 @@ class edificio(models.Model):
     atq = fields.Float(compute='_tipos')
     produccion_oro = fields.Float(compute='_tipos')
     porcentaje_nivel = fields.Float(default=0)
+
+    @api.model
+    def create(self, values):
+        edificioCreado = super(edificio, self).create(values)
+        jugador = edificioCreado.planeta.jugador
+        if jugador:
+            jugador.write({'oro': jugador.oro - 15})
+
+        return edificioCreado
 
     @api.constrains('nivel')
     def _check_nivel_limit(self):  # Nivel 99 es el maximo
@@ -78,7 +89,7 @@ class edificio(models.Model):
             elif e.porcentaje_nivel >= 100 & e.nivel == 99:
                 e.porcentaje_nivel = 100  # se queda en 100% para dar a entender que es el nivel maximo
 
-    @api.depends('tipo', 'nivel')
+    @api.depends('tipo', 'nivel')  # estadisticas segun el tipo
     def _tipos(self):
         for e in self:
             if e.tipo and e.nivel:

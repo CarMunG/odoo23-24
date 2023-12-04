@@ -1,50 +1,41 @@
 <odoo>
     <data>
-        <!-- Edificio -->
-        <record model="ir.ui.view" id="juego.formulario_edificio">
-            <field name="name">edificio.fomulario</field>
-            <field name="model">juego.edificio</field>
+        <!-- Jugador -->
+        <record model="ir.ui.view" id="juego.formulario_jugador">
+            <field name="name">jugador.formulario</field>
+            <field name="model">juego.jugador</field>
             <field name="arch" type="xml">
-                <form string="Edificio">
+                <form string="Jugador">
                     <sheet>
                         <group>
-                            <group string="Informacion General">
+                            <group string="Información General:">
                                 <field name="nombre"/>
-                                <field name="planeta"/>
-                                <field name="tipo"/>
-                                <field name="nivel"/>
-                                <field name="porcentaje_nivel"/>
-                            </group>
-                            <group string="Estadisticas">
-                                <field name="porcentaje_nivel" widget="progressbar"/>
-                                <field name="vida"/>
-                                <field name="max_vida"/>
-                                <field name="atq"/>
-                                <field name="produccion_oro"/>
-                            </group>
+                                <field name="oro"/>
                         </group>
-                    </sheet>
-                </form>
-            </field>
-        </record>
+                        <group string="Planetas bajo su control:">
+                            <field name="planetas" widget="one2many_list">
+                                <tree>
+                                    <field name="nombre"/>
+                                    <field name="num_edificios"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
-        <record model="ir.ui.view" id="juego.view_lista_edificios">
-            <field name="name">edificio tree</field>
-            <field name="model">juego.edificio</field>
-            <field name="arch" type="xml">
-                <tree>
-                    <field name="nombre"/>
-                    <field name="planeta"/>
-                    <field name="tipo"/>
-                    <field name="nivel"/>
-                    <field name="porcentaje_nivel" widget="progressbar"/>
-                    <field name="vida"/>
-                    <field name="max_vida"/>
-                    <field name="atq"/>
-                    <field name="produccion_oro"/>
-                </tree>
-            </field>
-        </record>
+    <record model="ir.ui.view" id="juego.view_lista_jugadores">
+        <field name="name">jugador.tree</field>
+        <field name="model">juego.jugador</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="nombre"/>
+                <field name="oro"/>
+            </tree>
+        </field>
+    </record>
 
         <!-- Planeta -->
         <record model="ir.ui.view" id="juego.formulario_planetas">
@@ -66,15 +57,14 @@
                 <form>
                     <sheet>
                         <group>
-                            <group string="Información General">
+                            <group string="Información General:">
                                 <field name="nombre" />
                                 <field name="jugador" />
                                 <field name="num_edificios" />
                             </group>
-                            <group string="Edificios">
+                            <group string="Edificios:">
                                 <field name="edificios">
                                     <tree>
-                                        <field name="nombre" />
                                         <field name="tipo" />
                                         <field name="nivel" />
                                     </tree>
@@ -85,5 +75,50 @@
                 </form>
             </field>
         </record>
+
+        <!-- Edificio -->
+        <record model="ir.ui.view" id="juego.formulario_edificio">
+            <field name="name">edificio.fomulario</field>
+            <field name="model">juego.edificio</field>
+            <field name="arch" type="xml">
+                <form string="Edificio">
+                    <sheet>
+                        <group>
+                            <group string="Informacion General:">
+                                <field name="tipo"/>
+                                <field name="nivel"/>
+                                <field name="porcentaje_nivel"/>
+                                <field name="planeta"/>
+                            </group>
+                            <group string="Estadisticas:">
+                                <field name="porcentaje_nivel" widget="progressbar"/>
+                                <field name="vida"/>
+                                <field name="max_vida"/>
+                                <field name="atq"/>
+                                <field name="produccion_oro"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="juego.view_lista_edificios">
+            <field name="name">edificio tree</field>
+            <field name="model">juego.edificio</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="tipo"/>
+                    <field name="nivel"/>
+                    <field name="porcentaje_nivel" widget="progressbar"/>
+                    <field name="vida"/>
+                    <field name="max_vida"/>
+                    <field name="atq"/>
+                    <field name="produccion_oro"/>
+                    <field name="planeta"/>
+                </tree>
+            </field>
+        </record>
+
     </data>
 </odoo>
