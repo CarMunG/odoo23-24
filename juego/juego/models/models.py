@@ -1,15 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Cada vez que se crea una clase añadirlo con permisos a security
-# si creo un nuevo archivo ponerlo en el init
-# todas las clases ponerlas en el views.xml y crear modelos para vistas.xml
-# ya cosas de Demo en demo.xml (1 Jugador, 1 planeta, 2 edificios)
-# Crear botones y cosas en vistas.xml
-# Poner mas constrains
-# Calcular las batallas
-# Crono Jobs: 1- sube de nivel los edificios cada min
-# Si algo da error y no sabes que es, entra sin update y desinstala->instala el modulo
-
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 from datetime import datetime, timedelta
@@ -38,7 +28,7 @@ class jugador(models.Model):
                 for e in p.edificios:
                     oro_generado += e.produccion_oro
 
-                j.write({'oro': j.oro + oro_generado})
+            j.write({'oro': j.oro + oro_generado})
 
 
 class planetas(models.Model):
@@ -165,8 +155,8 @@ class batalla(models.Model):
     fecha_final = fields.Datetime(compute='_get_fecha_final')
     fecha_restante = fields.Char(compute='_get_fecha_final')
     fecha_progreso = fields.Float(compute='_get_fecha_final')
-    jugador_1 = fields.Many2one('juego.jugador')
-    jugador_2 = fields.Many2one('juego.jugador')
+    jugador1 = fields.Many2one('juego.jugador', string='Jugador 1')
+    jugador2 = fields.Many2one('juego.jugador', string='Jugador 2')
     ganador = fields.Many2one('juego.jugador', string='Ganador', readonly=True)
     finalizada = fields.Boolean(default=False)
 
@@ -182,9 +172,9 @@ class batalla(models.Model):
                                                           restante.seconds % 60)
             b.fecha_progreso = (tiempo_pasado * 100) / (2 * 60)
 
-    def calcular_ganador(self):
-        edificios_jugador1 = self.jugador_1.planetas.mapped('edificios')
-        edificios_jugador2 = self.jugador_2.planetas.mapped('edificios')
+    def _calcular_ganador(self):
+        edificios_jugador1 = self.jugador1.planetas.mapped('edificios')
+        edificios_jugador2 = self.jugador2.planetas.mapped('edificios')
 
         fuerza_jugador1 = sum(edificio.atq + edificio.vida for edificio in edificios_jugador1)
         fuerza_jugador2 = sum(edificio.atq + edificio.vida for edificio in edificios_jugador2)
@@ -195,8 +185,6 @@ class batalla(models.Model):
             self.ganador = self.jugador2
         else:
             self.ganador = None
-
-        self.ganador.write({'oro': self.ganador.oro + 350})  # El jugador que gana consigue 350 de oro
 
     @api.depends('fecha_progreso')
     def finalizar_batalla(self):
@@ -210,5 +198,3 @@ class batalla(models.Model):
             if not f.finalizada:
                 f.calcular_ganador()
                 f.finalizada = True
-            else:
-                raise ValidationError("La batalla ya ha sido finalizada")

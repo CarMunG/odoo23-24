@@ -4,7 +4,7 @@
     <record model="ir.actions.act_window" id="juego.action_jugador">
       <field name="name">jugador window</field>
       <field name="res_model">juego.jugador</field>
-      <field name="view_mode">kanban,tree,form</field>
+      <field name="view_mode">tree,form</field>
     </record>
 
     <record model="ir.actions.act_window" id="juego.action_planetas">
@@ -16,7 +16,7 @@
     <record model="ir.actions.act_window" id="juego.action_edificio">
       <field name="name">edificio window</field>
       <field name="res_model">juego.edificio</field>
-      <field name="view_mode">kanban,tree,form</field>
+      <field name="view_mode">tree,form</field>
     </record>
 
     <record model="ir.actions.act_window" id="juego.action_batalla">

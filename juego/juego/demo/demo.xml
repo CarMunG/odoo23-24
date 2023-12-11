@@ -4,7 +4,9 @@
         <!-- Jugador -->
         <record id="demo_jugador" model="juego.jugador">
             <field name="nombre">Perico</field>
-            <field name="planetas" eval="[(4, [demo_planeta])]"/>
+            <field name="planetas" widget="many2many_tags">
+                [(4, ref('demo_planeta'))]
+            </field>
             <field name="oro">1000</field>
         </record>
 
@@ -12,7 +14,9 @@
         <record id="demo_planeta" model="juego.planetas">
             <field name="nombre">Planeta Tierra</field>
             <field name="jugador" ref="demo_jugador"/>
-            <field name="edificios" eval="[(4, [demo_edificio1]), (4, [demo_edificio2])]"/>
+            <field name="edificios" widget="many2many_tags">
+                [(4, demo_edificio1), (4, demo_edificio2)]
+            </field>
         </record>
 
         <!-- Edificios -->
@@ -29,6 +33,5 @@
             <field name="nivel">1</field>
             <field name="porcentaje_nivel">90.0</field>
         </record>
-
     </data>
 </odoo>

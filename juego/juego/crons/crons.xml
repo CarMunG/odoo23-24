@@ -1,5 +1,6 @@
 <odoo>
     <data>
+
         <!-- Sube el % del nivel de los edificios -->
         <record model="ir.cron" forcecreate="True" id="juego.cron_actualizar_niveles">
             <field name="name">Cron Actualizar Niveles Edificios</field>
@@ -37,5 +38,6 @@
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
         </record>
+
     </data>
 </odoo>
