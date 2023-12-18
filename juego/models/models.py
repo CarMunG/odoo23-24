@@ -24,21 +24,17 @@ class jugador(models.Model):
     planetas = fields.One2many('juego.planetas', 'jugador')
     oro = fields.Integer(default=50)
 
+    @api.model
+    def actualizar_oro(self):
+        for p in self.planetas:
+            for e in p.edificios:
+                self.oro += e.produccion_oro
+
     @api.constrains('nombre')
-    def _jnombre_vacio(self):
+    def _j_nombre_vacio(self):
         for n in self:
             if not n.nombre:
                 raise ValidationError("El nombre no puede estar vacio")
-
-    @api.model
-    def actualizar_oro(self):
-        for j in self:
-            oro_generado = 0
-            for p in j.planetas:
-                for e in p.edificios:
-                    oro_generado += e.produccion_oro
-
-                j.write({'oro': j.oro + oro_generado})
 
 
 class planetas(models.Model):
@@ -59,7 +55,7 @@ class planetas(models.Model):
                 e.num_edificios = 0
 
     @api.constrains('nombre')
-    def _pnombre_vacio(self):
+    def _p_nombre_vacio(self):
         for n in self:
             if not n.nombre:
                 raise ValidationError("El nombre del planeta no puede estar vacio")
@@ -190,13 +186,16 @@ class batalla(models.Model):
         fuerza_jugador2 = sum(edificio.atq + edificio.vida for edificio in edificios_jugador2)
 
         if fuerza_jugador1 > fuerza_jugador2:
-            self.ganador = self.jugador1
+            self.ganador = self.jugador_1
         elif fuerza_jugador2 > fuerza_jugador1:
-            self.ganador = self.jugador2
+            self.ganador = self.jugador_2
         else:
             self.ganador = None
 
         self.ganador.write({'oro': self.ganador.oro + 350})  # El jugador que gana consigue 350 de oro
+
+        for edificio_ganador in self.ganador.planetas.mapped('edificios'):  # Los edificios del ganador suben un 50%
+            edificio_ganador.porcentaje_nivel += 50
 
     @api.depends('fecha_progreso')
     def finalizar_batalla(self):

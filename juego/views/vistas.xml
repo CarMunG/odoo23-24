@@ -52,7 +52,7 @@
                                     <strong class="oe_kanban_title">
                                         <field name="nombre"/>
                                     </strong>
-                                    <div class="oe_kanban_footer">
+                                    <div class="oe_kanban_content">
                                         <span> Oro: <field name="oro"/> </span>
                                         <field name="planetas" widget="many2many_tags"/>
                                     </div>
@@ -126,7 +126,7 @@
                                 <field name="porcentaje_nivel" widget="progressbar"/>
                                 <field name="vida"/>
                                 <field name="atq"/>
-                                <field name="produccion_oro"/>
+                                <field name="produccion_oro" attrs="{'invisible':[('produccion_oro', '!=', '0,00')]}"/>
                             </group>
                         </group>
                     </sheet>
@@ -162,15 +162,13 @@
                             <div class="oe_kanban_content">
                                 <div class="oe_kanban_global_click">
                                     <field name="tipo"/>
-                                </div>
-                                <div>
-                                    <field name="nivel"/>
-                                </div>
-                                <div class="oe_kanban_bottom">
-                                    <field name="porcentaje_nivel" widget="progressbar"/>
-                                    <field name="vida"/>
-                                    <field name="atq"/>
-                                    <field name="produccion_oro"/>
+                                    <ul>
+                                        <li>Nivel: <field name="nivel"/></li>
+                                        <li><field name="porcentaje_nivel" widget="progressbar"/></li>
+                                        <li>Vida: <field name="vida"/></li>
+                                        <li>Ataque: <field name="atq"/></li>
+                                        <li>Produccion de Oro: <field name="produccion_oro"/></li>
+                                    </ul>
                                 </div>
                             </div>
                         </t>
@@ -218,7 +216,7 @@
                     <field name="jugador_1"/>
                     <field name="jugador_2"/>
                     <field name="ganador"/>
-                    <button string="Finalizar Batalla" class="oe_highlight" type="object" name="forzar_finalizar_batalla"/>
+                    <button string="Finalizar Batalla" class="oe_highlight" type="object" name="forzar_finalizar_batalla"/> <!--Boton para forzar que la batalla acabe-->
                 </tree>
             </field>
         </record>
