@@ -25,6 +25,7 @@
       <field name="view_mode">tree,form</field>
     </record>
 
+    <!--Vista para ver las batallas en un calendario-->
     <record model="ir.ui.view" id="juego.batalla_calendar_view">
       <field name="name">Batalla Calendar</field>
       <field name="model">juego.batalla</field>

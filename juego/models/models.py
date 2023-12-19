@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Cada vez que se crea una clase añadirlo con permisos a security
-# si creo un nuevo archivo ponerlo en el init
-# todas las clases ponerlas en el views.xml y crear modelos para vistas.xml
-# ya cosas de Demo en demo.xml (1 Jugador, 1 planeta, 2 edificios)
-# Crear botones y cosas en vistas.xml
-# Poner mas constrains
-# Calcular las batallas
-# Crono Jobs: 1- sube de nivel los edificios cada min
-# Si algo da error y no sabes que es, entra sin update y desinstala->instala el modulo
+#  Proyecto Carlos Muñoz Gimeno
 
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
@@ -25,13 +17,13 @@ class jugador(models.Model):
     oro = fields.Integer(default=50)
 
     @api.model
-    def actualizar_oro(self):
+    def actualizar_oro(self):  # Cron que recoge el Oro de los Edificios y se lo da al Jugador
         for p in self.planetas:
             for e in p.edificios:
                 self.oro += e.produccion_oro
 
     @api.constrains('nombre')
-    def _j_nombre_vacio(self):
+    def _j_nombre_vacio(self):  # Restriccion para que no tenga el nombre vacio
         for n in self:
             if not n.nombre:
                 raise ValidationError("El nombre no puede estar vacio")
@@ -47,7 +39,7 @@ class planetas(models.Model):
     num_edificios = fields.Integer(compute='_get_cant_edif')
 
     @api.depends('edificios')
-    def _get_cant_edif(self):
+    def _get_cant_edif(self):  # Devuelve la cantidad de Edificios que tiene un Planeta para mostrarlos en su view
         for e in self:
             if e.edificios:
                 e.num_edificios = len(e.edificios)
@@ -55,7 +47,7 @@ class planetas(models.Model):
                 e.num_edificios = 0
 
     @api.constrains('nombre')
-    def _p_nombre_vacio(self):
+    def _p_nombre_vacio(self):  # Restriccion para que no tenga el nombre vacio
         for n in self:
             if not n.nombre:
                 raise ValidationError("El nombre del planeta no puede estar vacio")
@@ -77,22 +69,22 @@ class edificio(models.Model):
     porcentaje_nivel = fields.Float(default=0)
 
     @api.model
-    def create(self, values):
-        edificioCreado = super(edificio, self).create(values)
-        jugador = edificioCreado.planeta.jugador
+    def create(self, values):  # Cuando se crea un nuevo edificio le quita 15 de oro al Jugador
+        edificio_creado = super(edificio, self).create(values)
+        jugador = edificio_creado.planeta.jugador
         if jugador:
-            jugador.write({'oro': jugador.oro - 15})
+            jugador.write({'oro': jugador.oro - 15})  # Cuesta 15 de Oro crear cada Edificio
 
-        return edificioCreado
+        return edificio_creado
 
     @api.constrains('nivel')
-    def _check_nivel_limit(self):  # Nivel 99 es el maximo
+    def _check_nivel_limit(self):  # Restriccion para que el nivel no supere el limite
         for e in self:
-            if e.nivel > 99:
+            if e.nivel > 99:  # Nivel 99 es el maximo
                 raise ValidationError('El nivel del edificio no puede superar 99')
 
     @api.model
-    def subir_nivel(self):
+    def subir_nivel(self):  # Cron que sube el % de nivel de cada Edificio
         for e in self.search([('porcentaje_nivel', '<', 100)]):
             e.porcentaje_nivel += 1 / (e.nivel + 1)
             if e.porcentaje_nivel >= 100 & e.nivel < 99:
@@ -101,7 +93,7 @@ class edificio(models.Model):
             elif e.porcentaje_nivel >= 100 & e.nivel == 99:
                 e.porcentaje_nivel = 100  # se queda en 100% para dar a entender que es el nivel maximo
 
-    @api.depends('tipo', 'nivel')  # estadisticas segun el tipo
+    @api.depends('tipo', 'nivel')  # Da estadisticas al Edificio segun el tipo
     def _tipos(self):
         for e in self:
             if e.tipo and e.nivel:
@@ -145,7 +137,7 @@ class edificio(models.Model):
                     e.vida = e.max_vida
                     e.atq = e.nivel * 40
                     e.produccion_oro = 0
-            else:
+            else:  # Si no selecciona ningun tipo se vacian las estadisticas
                 e.max_vida = None
                 e.vida = None
                 e.atq = None
@@ -167,7 +159,7 @@ class batalla(models.Model):
     finalizada = fields.Boolean(default=False)
 
     @api.depends('fecha_inicio')
-    def _get_fecha_final(self):
+    def _get_fecha_final(self):  # Calcula la fecha final, restante y el % que a progresado la batalla
         for b in self:
             inicio = fields.Datetime.from_string(b.fecha_inicio)
             final = inicio + timedelta(hours=2)
@@ -178,7 +170,7 @@ class batalla(models.Model):
                                                           restante.seconds % 60)
             b.fecha_progreso = (tiempo_pasado * 100) / (2 * 60)
 
-    def calcular_ganador(self):
+    def calcular_ganador(self):  # Calcula el ganador dependiendo de la vida y ataque de los Edificios de los Jugadores
         edificios_jugador1 = self.jugador_1.planetas.mapped('edificios')
         edificios_jugador2 = self.jugador_2.planetas.mapped('edificios')
 
@@ -197,17 +189,17 @@ class batalla(models.Model):
         for edificio_ganador in self.ganador.planetas.mapped('edificios'):  # Los edificios del ganador suben un 50%
             edificio_ganador.porcentaje_nivel += 50
 
-    @api.depends('fecha_progreso')
+    @api.depends('fecha_progreso')  # Cron que comprueba si llega a 100% para acabar la batalla
     def finalizar_batalla(self):
         for f in self:
             if not f.finalizada and f.fecha_progreso == 100:
                 f.calcular_ganador()
                 f.finalizada = True
 
-    def forzar_finalizar_batalla(self):  # para llamarlo con un boton en la interfaz para no tener que esperarse
+    def forzar_finalizar_batalla(self):  # para llamarlo con un boton en la view para no tener que esperarse
         for f in self:
             if not f.finalizada:
                 f.calcular_ganador()
                 f.finalizada = True
-            else:
+            else:  # Salta un error si la Batalla ya ha sido finalizada
                 raise ValidationError("La batalla ya ha sido finalizada")
