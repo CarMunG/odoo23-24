@@ -1,3 +1,4 @@
+<oddo>
     <data>
 
         <!-- Datos demo -->
@@ -9,7 +10,7 @@
 
         <!-- Planeta -->
         <record id="demo_planeta" model="juego.planetas">
-            <field name="nombre">Planeta Tierra</field>
+            <field name="nombre">Tierra</field>
             <field name="jugador" ref="demo_jugador"/>
         </record>
 
@@ -30,4 +31,4 @@
         </record>
 
     </data>
-</odoo>
+</oddo>
