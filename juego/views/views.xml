@@ -43,13 +43,13 @@
       <field name="view_id" ref="juego.batalla_calendar_view"/>
     </record>
 
-    <!--Pensar de que hacer el Wizard y cambiar el id y eso "x"-->
-    <record model="ir.actions.act_window" id="juego.launch_x_wizard">
-      <field name="name">Launch x</field>
-      <field name="res_model">juego.wizard</field>
+    <!--Vista del Wizard para Planetas-->
+    <record model="ir.actions.act_window" id="juego.launch_planeta_wizard">
+      <field name="name">Launch Planeta Wizard</field>
+      <field name="res_model">juego.planeta_wizard</field>
       <field name="view_mode">form</field>
       <field name="target">new</field>
-      <field name="binding_model_id" ref="model_juego_x"/>
+      <field name="binding_model_id" ref="model_juego_planetas"/>
     </record>
 
 

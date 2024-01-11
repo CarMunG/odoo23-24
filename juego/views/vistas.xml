@@ -1,24 +1,23 @@
 <odoo>
     <data>
 
-        <!--Wizard-->
-        <record model="ir.ui.view" id="juego.view_lista_planetas">
-            <field name="name">Wizard Form</field>
-            <field name="model">juego.wizard</field>
+        <!--Wizard Planetas-->
+        <record model="ir.ui.view" id="juego.planetas_wizard_view">
+            <field name="name">Planeta Wizard Form</field>
+            <field name="model">juego.planeta_wizard</field>
             <field name="arch" type="xml">
                 <form>
                     <sheet>
                         <group>
+                            <field name="nombre" />
+                            <field name="jugador" />
                             <footer>
-                                <button name="crear_x" type="object"
-                                string="Crear x" class="oe_highlight"/>
-                                or
+                                <!--Guarda el Planeta permanentemente-->
+                                <button name="crear_planeta" type="object"
+                                string="Crear Planeta" class="oe_highlight"/>
                                 <button special="cancel" string="Cancelar"/>
 
-                                <!--Poner este boton en la vista form en la que quiera abrir el Wizard (aparte de la clase que crea-->
-                                <button name="%(juego.launch_x_wizard)d" type="action" string="Crear x" class="oe_highlight"
-                                context="{'x_context': active_id}"/>
-                                <!--El name es el mismo que en views, asi que cambiarlo igual-->
+                                <!--El boton para abrir el Wizard desde fuera de Planetas esta en Jugador-->
 
                             </footer>
                         </group>
@@ -47,6 +46,12 @@
                                         <field name="num_edificios"/>
                                     </tree>
                                 </field>
+                            </group>
+                            <group>
+
+                                <!--Boton para abrir el Wizard de crear Planetas-->
+                                <button name="%(juego.launch_planeta_wizard)d" type="action" string="Crear Planeta" class="oe_highlight"/>
+
                             </group>
                         </group>
                     </sheet>
