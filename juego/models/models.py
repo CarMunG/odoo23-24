@@ -5,8 +5,8 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 
+#  PRIMER TRIMESTRE
 
 class jugador(models.Model):
     _name = 'juego.jugador'
@@ -203,3 +203,15 @@ class batalla(models.Model):
                 f.finalizada = True
             else:  # Salta un error si la Batalla ya ha sido finalizada
                 raise ValidationError("La batalla ya ha sido finalizada")
+
+#  SEGUNDO TRIMESTRE
+    class wizard(models.TransientModel):  # Pensar de que hacerlo
+        # Copiar los atributos de lo que sea, pero NO los One2many
+        # Cambiar el nombre de los permisos en security cuando cambie el nombre y eso, tambien en views y vistas
+        _name = 'juego.wizard'
+
+        def crear_x(self):  # Cambiar el nombre de la funcion cuando eso y tambien cambiarla en vistas.xml
+            self.env["juego.x"].create({
+                "nombre variable": self.variable,  # Cambiar el nombre de a las cosas que va a crear
+                "nombre variable 2": self.variable2
+            })
