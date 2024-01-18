@@ -26,6 +26,50 @@
             </field>
         </record>
 
+        <!--Wizard Batallas-->
+        <record model="ir.ui.view" id="juego.batallas_wizard_view">
+            <field name="name">Juego Batalla Wizard</field>
+            <field name="model">juego.batalla_wizard</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <!--Botones para moverse entre las paginas-->
+                        <button name="action_previous" type="object"
+                                string="Previous" states="jugadores,fecha"
+                        />
+                        <button name="action_next" type="object"
+                                string="Next"
+                                states="nombre,jugadores"
+                                class="oe_highlight"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <!--Las paginas disponibles-->
+                        <group states="nombre">
+                            <field name="nombre"/>
+                        </group>
+                        <group states="jugadores">
+                            <field name="jugador_1"/>
+                            <field name="jugador_2"/>
+                        </group>
+                        <group states="fecha">
+                            <field name="fecha_inicio"/>
+                            <field name="fecha_final"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <!--Guarda la Batalla permanentemente-->
+                        <button states="fecha" name="crear_batalla" type="object"
+                                string="Create Battle" class="oe_highlight"/>
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+
+                    <!--El boton para abrir el Wizard esta en Jugador-->
+
+                </form>
+            </field>
+        </record>
+
         <!-- Jugador -->
         <!-- vista form -->
         <record model="ir.ui.view" id="juego.formulario_jugador">
@@ -47,10 +91,15 @@
                                     </tree>
                                 </field>
                             </group>
-                            <group>
+                            <group string="Wizards:">
 
                                 <!--Boton para abrir el Wizard de crear Planetas-->
-                                <button name="%(juego.launch_planeta_wizard)d" type="action" string="Crear Planeta" class="oe_highlight"/>
+                                <button name="%(juego.launch_planeta_wizard)d" type="action" string="Crear Planeta" class="oe_highlight"
+                                context="{'player_context': active_id}"/>
+
+                                <!--Boton para abrir el Wizard de crear Batallas-->
+                                <button name="%(juego.launch_batalla_wizard)d" type="action" string="Crear Batalla" class="oe_highlight"
+                                context="{'player_context': active_id}"/>
 
                             </group>
                         </group>
@@ -248,7 +297,7 @@
                     <field name="jugador_1"/>
                     <field name="jugador_2"/>
                     <field name="ganador"/>
-                    <button string="Finalizar Batalla" class="oe_highlight" type="object" name="forzar_finalizar_batalla"/> <!--Boton para forzar que la batalla acabe-->
+                    <button string="Finalizar Batalla" class="oe_highlight" type="object" name="forzar_finalizar_batalla"/> <!--Boton para forzar que acabe la batalla-->
                 </tree>
             </field>
         </record>

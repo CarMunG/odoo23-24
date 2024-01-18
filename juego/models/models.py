@@ -154,8 +154,8 @@ class batalla(models.Model):
     fecha_final = fields.Datetime(compute='_get_fecha_final')
     fecha_restante = fields.Char(compute='_get_fecha_final')
     fecha_progreso = fields.Float(compute='_get_fecha_final')
-    jugador_1 = fields.Many2one('juego.jugador')
-    jugador_2 = fields.Many2one('juego.jugador')
+    jugador_1 = fields.Many2one('juego.jugador', domain="[('id','!=',jugador_2)]")
+    jugador_2 = fields.Many2one('juego.jugador', domain="[('id','!=',jugador_1)]")
     ganador = fields.Many2one('juego.jugador', string='Ganador', readonly=True)
     finalizada = fields.Boolean(default=False)
 
@@ -164,12 +164,21 @@ class batalla(models.Model):
         for b in self:
             inicio = fields.Datetime.from_string(b.fecha_inicio)
             final = inicio + timedelta(hours=2)
-            restante = final - datetime.now()
-            tiempo_pasado = (datetime.now() - inicio).total_seconds() / 60
+
+            if not b.finalizada:  # Para que no sobreescriba constantemente el % si se finaliza con antelacion
+                restante = final - datetime.now()
+                tiempo_pasado = (datetime.now() - inicio).total_seconds() / 60
+                if tiempo_pasado < 0:  # Por si la batalla se no inicia cuando se crea para que no salga -x%
+                    b.fecha_progreso = 0
+                else:
+                    b.fecha_progreso = (tiempo_pasado * 100) / (2 * 60)
+            else:
+                restante = timedelta(0)
+                b.fecha_progreso = 100
+
             b.fecha_final = fields.Datetime.to_string(final)
             b.fecha_restante = "{:02}:{:02}:{:02}".format(restante.seconds // 3600, (restante.seconds // 60) % 60,
                                                           restante.seconds % 60)
-            b.fecha_progreso = (tiempo_pasado * 100) / (2 * 60)
 
     def calcular_ganador(self):  # Calcula el ganador dependiendo de la vida y ataque de los Edificios de los Jugadores
         edificios_jugador1 = self.jugador_1.planetas.mapped('edificios')
@@ -193,7 +202,7 @@ class batalla(models.Model):
     @api.depends('fecha_progreso')  # Cron que comprueba si llega a 100% para acabar la batalla
     def finalizar_batalla(self):
         for f in self:
-            if not f.finalizada and f.fecha_progreso == 100:
+            if not f.finalizada and f.fecha_progreso >= 100:
                 f.calcular_ganador()
                 f.finalizada = True
 
@@ -211,11 +220,95 @@ class batalla(models.Model):
         _name = 'juego.planeta_wizard'
         _description = 'Wizard Planeta'
 
+        # Consigue el contexto que se manda por el boton
+        def _get_jugador(self):
+            return self._context.get('player_context')
+
         nombre = fields.Char()
-        jugador = fields.Many2one('juego.jugador')
+        jugador = fields.Many2one('juego.jugador', required=True, default=_get_jugador)
 
         def crear_planeta(self):
             self.env["juego.planetas"].create({
                 "nombre": self.nombre,
-                "jugador": self.jugador.id  # Si es un objeto, guarda el id, si no, el valor
+                "jugador": self.jugador.id
             })
+
+    class batalla_wizard(models.TransientModel):
+        _name = 'juego.batalla_wizard'
+        _description = 'Wizard Batalla'
+
+        # Consigue el contexto que se manda por el boton
+        def _get_jugador_1(self):
+            return self._context.get('player_context')
+
+        state = fields.Selection([
+            ('nombre', "Name Selection"),
+            ('jugadores', "Players Selection"),
+            ('fecha', "Dates Selection"),
+        ], default='nombre')
+
+        nombre = fields.Char()
+        fecha_inicio = fields.Datetime(default=lambda self: fields.Datetime.now(), required=True)
+        fecha_final = fields.Datetime(compute='_get_fecha_final')
+        jugador_1 = fields.Many2one('juego.jugador', readonly=True, default=_get_jugador_1,
+                                    domain="[('id','!=',jugador_2)]")
+        jugador_2 = fields.Many2one('juego.jugador', domain="[('id','!=',jugador_1)]")
+
+        @api.depends('fecha_inicio')
+        def _get_fecha_final(self):
+            for b in self:
+                inicio = fields.Datetime.from_string(b.fecha_inicio)
+                final = inicio + timedelta(hours=2)
+                b.fecha_final = fields.Datetime.to_string(final)
+
+        def crear_batalla(self):
+            min_date = fields.Datetime.from_string(fields.Datetime.now()) - timedelta(minutes=5)
+            if self.fecha_inicio < min_date:
+                self.fecha_inicio = fields.Datetime.now()
+
+            self.env["juego.batalla"].create({
+                "nombre": self.nombre,
+                "fecha_inicio": self.fecha_inicio,
+                "jugador_1": self.jugador_1.id,
+                "jugador_2": self.jugador_2.id
+            })
+
+        def action_previous(self):
+            if self.state == 'jugadores':
+                self.state = 'nombre'
+            elif self.state == 'fecha':
+                self.state = 'jugadores'
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Launch Batalla Wizard',
+                'res_model': self._name,
+                'view_mode': 'form',
+                'target': 'new',
+                'res_id': self.id,
+                'context': self._context
+            }
+
+        def action_next(self):
+            if self.state == 'nombre':
+                self.state = 'jugadores'
+            elif self.state == 'jugadores':
+                self.state = 'fecha'
+            return {
+                'type': 'ir.actions.act_window',
+                'name': 'Launch Batalla Wizard',
+                'res_model': self._name,
+                'view_mode': 'form',
+                'target': 'new',
+                'res_id': self.id,
+                'context': self._context
+            }
+
+        @api.onchange('fecha_inicio')
+        def _onchange_start(self):
+            min_date = fields.Datetime.from_string(fields.Datetime.now()) - timedelta(minutes=5)
+            if self.fecha_inicio < min_date:
+                self.fecha_inicio = fields.Datetime.now()
+                return {
+                    'warning': {'title': "Warning", 'message': "La fecha de inico no puede ser anterior a ahora",
+                                'type': 'notification'},
+                }

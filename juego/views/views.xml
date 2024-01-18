@@ -45,11 +45,19 @@
 
     <!--Vista del Wizard para Planetas-->
     <record model="ir.actions.act_window" id="juego.launch_planeta_wizard">
-      <field name="name">Launch Planeta Wizard</field>
+      <field name="name">Planeta Wizard</field>
       <field name="res_model">juego.planeta_wizard</field>
       <field name="view_mode">form</field>
       <field name="target">new</field>
       <field name="binding_model_id" ref="model_juego_planetas"/>
+    </record>
+
+    <!--Vista del Wizard para Batallas-->
+    <record model="ir.actions.act_window" id="juego.launch_batalla_wizard">
+      <field name="name">Batalla Wizard</field>
+      <field name="res_model">juego.batalla_wizard</field>
+      <field name="view_mode">form</field>
+      <field name="target">new</field>
     </record>
 
 
