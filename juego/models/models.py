@@ -216,18 +216,18 @@ class batalla(models.Model):
 
     #  SEGUNDO TRIMESTRE
     class planeta_wizard(models.TransientModel):
-        # Copiar los atributos de lo que sea, pero NO los One2many
+        # Nota: Copiar los atributos de lo que se haga el Wizard, pero NO los One2many
         _name = 'juego.planeta_wizard'
         _description = 'Wizard Planeta'
 
-        # Consigue el contexto que se manda por el boton
+        # Consigue el contexto que se manda por el boton (Si se accede al Wizard desde Jugador y no Planetas)
         def _get_jugador(self):
             return self._context.get('player_context')
 
         nombre = fields.Char()
         jugador = fields.Many2one('juego.jugador', required=True, default=_get_jugador)
 
-        def crear_planeta(self):
+        def crear_planeta(self):  # Crea un Planeta permanente al crearlo desde el Wizard
             self.env["juego.planetas"].create({
                 "nombre": self.nombre,
                 "jugador": self.jugador.id
@@ -255,15 +255,16 @@ class batalla(models.Model):
         jugador_2 = fields.Many2one('juego.jugador', domain="[('id','!=',jugador_1)]")
 
         @api.depends('fecha_inicio')
-        def _get_fecha_final(self):
+        def _get_fecha_final(self):  # Metodo adaptado de la clase "batalla" para calcular "fecha_final"
             for b in self:
                 inicio = fields.Datetime.from_string(b.fecha_inicio)
                 final = inicio + timedelta(hours=2)
                 b.fecha_final = fields.Datetime.to_string(final)
 
-        def crear_batalla(self):
+        def crear_batalla(self):  # Crea una Batalla permanente al crearla desde el Wizard
             min_date = fields.Datetime.from_string(fields.Datetime.now()) - timedelta(minutes=5)
             if self.fecha_inicio < min_date:
+                # Comprueba que la fecha de inicio no sea anterior a la fecha de creacion para que no hagan trampas
                 self.fecha_inicio = fields.Datetime.now()
 
             self.env["juego.batalla"].create({
@@ -273,7 +274,7 @@ class batalla(models.Model):
                 "jugador_2": self.jugador_2.id
             })
 
-        def action_previous(self):
+        def action_previous(self):  # Cambia es estado del Wizard al anterior ( jugadores > nombre, fecha > jugadores )
             if self.state == 'jugadores':
                 self.state = 'nombre'
             elif self.state == 'fecha':
@@ -288,7 +289,7 @@ class batalla(models.Model):
                 'context': self._context
             }
 
-        def action_next(self):
+        def action_next(self):  # Cambia es estado del Wizard al anterior ( nombre > jugadores, jugadores > fecha )
             if self.state == 'nombre':
                 self.state = 'jugadores'
             elif self.state == 'jugadores':
@@ -304,11 +305,12 @@ class batalla(models.Model):
             }
 
         @api.onchange('fecha_inicio')
-        def _onchange_start(self):
+        def _onchange_start(self):  # Comprueba que la fecha de inicio no sea anterior a la fecha de creacion y avisa
             min_date = fields.Datetime.from_string(fields.Datetime.now()) - timedelta(minutes=5)
             if self.fecha_inicio < min_date:
                 self.fecha_inicio = fields.Datetime.now()
                 return {
-                    'warning': {'title': "Warning", 'message': "La fecha de inico no puede ser anterior a ahora",
+                    'warning': {'title': "Warning", 'message':
+                                "La fecha de inico no puede ser anterior a la fecha de creacion",
                                 'type': 'notification'},
                 }
