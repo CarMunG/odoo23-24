@@ -72,9 +72,10 @@
 
         <!-- Jugador -->
         <!-- vista form -->
+        <!--Añadido los botones para llamar a los Wizards planeta_wizard y batalla_wizard-->
         <record model="ir.ui.view" id="juego.formulario_jugador">
             <field name="name">jugador.formulario</field>
-            <field name="model">juego.jugador</field>
+            <field name="model">res.partner</field>
             <field name="arch" type="xml">
                 <form string="Jugador">
                     <sheet>
@@ -111,7 +112,7 @@
         <!-- vista tree -->
         <record model="ir.ui.view" id="juego.view_lista_jugadores">
             <field name="name">jugador.tree</field>
-            <field name="model">juego.jugador</field>
+            <field name="model">res.partner</field>
             <field name="arch" type="xml">
                 <tree>
                     <field name="nombre"/>
@@ -123,7 +124,7 @@
         <!-- vista kanban -->
         <record model="ir.ui.view" id="juego.kanban_jugador">
             <field name="name">jugador.kanban</field>
-            <field name="model">juego.jugador</field>
+            <field name="model">res.partner</field>
             <field name="arch" type="xml">
                 <kanban>
                     <templates>

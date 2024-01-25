@@ -3,8 +3,12 @@
 
     <record model="ir.actions.act_window" id="juego.action_jugador">
       <field name="name">jugador window</field>
-      <field name="res_model">juego.jugador</field>
+      <field name="res_model">res.partner</field>
       <field name="view_mode">kanban,tree,form</field>
+      <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'view_mode': 'tree', 'view_id': ref('juego.view_lista_jugadores')}),
+            (0, 0, {'view_mode': 'form', 'view_id': ref('juego.formulario_jugador')}),
+            (0, 0, {'view_mode': 'kanban', 'view_id': ref('juego.kanban_jugador')}),]"/>
     </record>
 
     <record model="ir.actions.act_window" id="juego.action_planetas">

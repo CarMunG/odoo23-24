@@ -8,10 +8,14 @@ from datetime import datetime, timedelta
 
 
 #  PRIMER TRIMESTRE
+#  Cambios hechos aqui para el 2º trim:
+#  1. jugador hereda de res.partner
+#  Las cosas que son completamente nuevas del 2º trim estan mas abajo
 
 class jugador(models.Model):
-    _name = 'juego.jugador'
-    _description = 'El jugador'
+    _name = 'res.partner'
+    _inherit = 'res.partner'  # Herencia de res.partner
+    _description = 'Un jugador'
 
     nombre = fields.Char()
     planetas = fields.One2many('juego.planetas', 'jugador')
@@ -35,7 +39,7 @@ class planetas(models.Model):
     _description = 'Uno de los planetas'
 
     nombre = fields.Char()
-    jugador = fields.Many2one('juego.jugador')
+    jugador = fields.Many2one('res.partner')
     edificios = fields.One2many('juego.edificio', 'planeta')
     num_edificios = fields.Integer(compute='_get_cant_edif')
 
@@ -154,9 +158,9 @@ class batalla(models.Model):
     fecha_final = fields.Datetime(compute='_get_fecha_final')
     fecha_restante = fields.Char(compute='_get_fecha_final')
     fecha_progreso = fields.Float(compute='_get_fecha_final')
-    jugador_1 = fields.Many2one('juego.jugador', domain="[('id','!=',jugador_2)]")
-    jugador_2 = fields.Many2one('juego.jugador', domain="[('id','!=',jugador_1)]")
-    ganador = fields.Many2one('juego.jugador', string='Ganador', readonly=True)
+    jugador_1 = fields.Many2one('res.partner', domain="[('id','!=',jugador_2)]")
+    jugador_2 = fields.Many2one('res.partner', domain="[('id','!=',jugador_1)]")
+    ganador = fields.Many2one('res.partner', string='Ganador', readonly=True)
     finalizada = fields.Boolean(default=False)
 
     @api.depends('fecha_inicio')
@@ -220,12 +224,12 @@ class batalla(models.Model):
         _name = 'juego.planeta_wizard'
         _description = 'Wizard Planeta'
 
-        # Consigue el contexto que se manda por el boton (Si se accede al Wizard desde Jugador y no Planetas)
+        # Consigue el contexto que enviado por el boton (Si se accede al Wizard desde Jugador)
         def _get_jugador(self):
             return self._context.get('player_context')
 
         nombre = fields.Char()
-        jugador = fields.Many2one('juego.jugador', required=True, default=_get_jugador)
+        jugador = fields.Many2one('res.partner', required=True, default=_get_jugador)
 
         def crear_planeta(self):  # Crea un Planeta permanente al crearlo desde el Wizard
             self.env["juego.planetas"].create({
@@ -237,7 +241,7 @@ class batalla(models.Model):
         _name = 'juego.batalla_wizard'
         _description = 'Wizard Batalla'
 
-        # Consigue el contexto que se manda por el boton
+        # Consigue el contexto que enviado por el boton
         def _get_jugador_1(self):
             return self._context.get('player_context')
 
@@ -250,9 +254,9 @@ class batalla(models.Model):
         nombre = fields.Char()
         fecha_inicio = fields.Datetime(default=lambda self: fields.Datetime.now(), required=True)
         fecha_final = fields.Datetime(compute='_get_fecha_final')
-        jugador_1 = fields.Many2one('juego.jugador', readonly=True, default=_get_jugador_1,
+        jugador_1 = fields.Many2one('res.partner', readonly=True, default=_get_jugador_1,
                                     domain="[('id','!=',jugador_2)]")
-        jugador_2 = fields.Many2one('juego.jugador', domain="[('id','!=',jugador_1)]")
+        jugador_2 = fields.Many2one('res.partner', domain="[('id','!=',jugador_1)]")
 
         @api.depends('fecha_inicio')
         def _get_fecha_final(self):  # Metodo adaptado de la clase "batalla" para calcular "fecha_final"
@@ -311,6 +315,6 @@ class batalla(models.Model):
                 self.fecha_inicio = fields.Datetime.now()
                 return {
                     'warning': {'title': "Warning", 'message':
-                                "La fecha de inico no puede ser anterior a la fecha de creacion",
+                        "La fecha de inico no puede ser anterior a la fecha de creacion",
                                 'type': 'notification'},
                 }

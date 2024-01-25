@@ -1,3 +1,4 @@
+<!--Lo unico que he cambiado aqui es el cron que afecta al jugador que afecte a res.partner (por la herencia)-->
 <odoo>
     <data>
         <!-- Sube el % del nivel de los edificios -->
@@ -16,7 +17,7 @@
         <!-- Suma el oro generado por los edificios de los planetas del jugador -->
         <record model="ir.cron" forcecreate="True" id="juego.cron_actualizar_oro">
             <field name="name">Cron Actualizar Oro Jugadores</field>
-            <field name="model_id" ref="model_juego_jugador"/>
+            <field name="model_id" ref="model_res_partner"/>
             <field name="state">code</field>
             <field name="code">model.actualizar_oro()</field>
             <field name="user_id" ref="base.user_root"/>
