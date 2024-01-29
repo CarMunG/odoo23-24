@@ -1,10 +1,37 @@
 <odoo>
   <data>
+    <!--Cambios 2º Trim:
+      -Añadida vista de jugador cambiada para que use mis views y no los de res.partner
+      - Añadidas vistas form del Wizard para Planetas y Batallas
+      -->
 
+    <record model="ir.ui.view" id="outward.player_search_view">
+      <field name="name">Player Outward search</field>
+      <field name="model">res.partner</field>
+      <field name="arch" type="xml">
+          <search>
+              <filter name="is_player_filter" string="Is Player" domain="[('is_player','=',True)]"/>
+          </search>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="juego.jugador_search_view">
+    <field name="name">Outward Players search</field>
+    <field name="model">res.partner</field>
+    <field name="arch" type="xml">
+      <search>
+        <filter name="is_player_filter" string="Is Player" domain="[('is_player','=',True)]"/>
+      </search>
+    </field>
+  </record>
+
+    <!--Vista de jugador cambiada para que use mis views y no los de res.partner-->
     <record model="ir.actions.act_window" id="juego.action_jugador">
       <field name="name">jugador window</field>
       <field name="res_model">res.partner</field>
       <field name="view_mode">kanban,tree,form</field>
+      <field name="search_view_id" ref="juego.jugador_search_view"/>
+      <!--Filtro para buscar si es un Jugador y no un res.partner normal-->
       <field name="view_ids" eval="[(5, 0, 0),
             (0, 0, {'view_mode': 'tree', 'view_id': ref('juego.view_lista_jugadores')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('juego.formulario_jugador')}),
