@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 
 #  PRIMER TRIMESTRE
 #  Cambios hechos aqui para el 2º trim:
-#  1. jugador hereda de res.partner
+#  - jugador hereda de res.partner
+#  - nuevo campo el jugador pa poder filtrar entre jugador y res.partner normal
 #  Las cosas que son completamente nuevas del 2º trim estan mas abajo
 
 class jugador(models.Model):
@@ -20,6 +21,7 @@ class jugador(models.Model):
     nombre = fields.Char()
     planetas = fields.One2many('juego.planetas', 'jugador')
     oro = fields.Integer(default=50)
+    es_jugador = fields.Boolean(default=True)
 
     @api.model
     def actualizar_oro(self):  # Cron que recoge el Oro de los Edificios y se lo da al Jugador
