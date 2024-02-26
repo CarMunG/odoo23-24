@@ -36,7 +36,7 @@
       <field name="arch" type="xml">
 
         <xpath expr="//field[@name='vat']" position="after">
-          <field name="is_player"/>
+          <field name="es_jugador"/>
         </xpath>
 
         <notebook position="inside">
