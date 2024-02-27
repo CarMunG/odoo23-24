@@ -5,12 +5,13 @@
       - Añadidas vistas form del Wizard para Planetas y Batallas
       -->
 
+    <!--Filtro para buscar si es un Jugador y no un res.partner normal-->
     <record model="ir.ui.view" id="juego.jugador_search_view">
     <field name="name">Outward Players search</field>
     <field name="model">res.partner</field>
     <field name="arch" type="xml">
       <search>
-        <filter name="is_player_filter" string="Is Player" domain="[('es_jugador','=',True)]"/>
+        <filter name="is_jugador_filter" string="Es Jugador" domain="[('es_jugador','=',True)]"/>
       </search>
     </field>
   </record>
@@ -21,11 +22,33 @@
       <field name="res_model">res.partner</field>
       <field name="view_mode">kanban,tree,form</field>
       <field name="search_view_id" ref="juego.jugador_search_view"/>
-      <!--Filtro para buscar si es un Jugador y no un res.partner normal-->
+      
       <field name="view_ids" eval="[(5, 0, 0),
             (0, 0, {'view_mode': 'tree', 'view_id': ref('juego.view_lista_jugadores')}),
             (0, 0, {'view_mode': 'form', 'view_id': ref('juego.formulario_jugador')}),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('juego.kanban_jugador')}),]"/>
+    </record>
+
+    <record model="ir.ui.view" id="juego.jugador_inherit_view">
+      <field name="name">Jugador herencia window</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="arch" type="xml">
+
+        <xpath expr="//field[@name='vat']" position="after">
+          <field name="es_jugador"/>
+        </xpath>
+
+        <notebook position="inside">
+          <page string="Jugador">
+            <group>
+              <field name="nombre"/>
+              <field name="oro"/>
+              <field name="planetas" widget="one2many_list">
+            </group>
+          </page>
+        </notebook>
+      </field>
     </record>
 
     <record model="ir.actions.act_window" id="juego.action_planetas">

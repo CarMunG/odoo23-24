@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 
 #  PRIMER TRIMESTRE
 #  Cambios hechos aqui para el 2º trim:
-#  1. jugador hereda de res.partner
+#  - jugador hereda de res.partner
+#  - nuevo campo el jugador pa poder filtrar entre jugador y res.partner normal
 #  Las cosas que son completamente nuevas del 2º trim estan mas abajo
 
 class jugador(models.Model):
