@@ -28,7 +28,7 @@
             (0, 0, {'view_mode': 'form', 'view_id': ref('juego.formulario_jugador')}),
             (0, 0, {'view_mode': 'kanban', 'view_id': ref('juego.kanban_jugador')}),]"/>
     </record>
-
+    <!--
     <record model="ir.ui.view" id="juego.jugador_inherit_view">
       <field name="name">Jugador herencia window</field>
       <field name="model">res.partner</field>
@@ -50,7 +50,7 @@
         </notebook>
       </field>
     </record>
-
+    -->
     <record model="ir.actions.act_window" id="juego.action_planetas">
       <field name="name">planetas window</field>
       <field name="res_model">juego.planetas</field>
