@@ -20,6 +20,7 @@ class jugador(models.Model):
     nombre = fields.Char()
     planetas = fields.One2many('juego.planetas', 'jugador')
     oro = fields.Integer(default=50)
+    es_jugador = fields.Boolean(default=True)
 
     @api.model
     def actualizar_oro(self):  # Cron que recoge el Oro de los Edificios y se lo da al Jugador

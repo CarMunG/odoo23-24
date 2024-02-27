@@ -5,22 +5,12 @@
       - Añadidas vistas form del Wizard para Planetas y Batallas
       -->
 
-    <record model="ir.ui.view" id="outward.player_search_view">
-      <field name="name">Player Outward search</field>
-      <field name="model">res.partner</field>
-      <field name="arch" type="xml">
-          <search>
-              <filter name="is_player_filter" string="Is Player" domain="[('is_player','=',True)]"/>
-          </search>
-      </field>
-    </record>
-
     <record model="ir.ui.view" id="juego.jugador_search_view">
     <field name="name">Outward Players search</field>
     <field name="model">res.partner</field>
     <field name="arch" type="xml">
       <search>
-        <filter name="is_player_filter" string="Is Player" domain="[('is_player','=',True)]"/>
+        <filter name="is_player_filter" string="Is Player" domain="[('es_jugador','=',True)]"/>
       </search>
     </field>
   </record>
